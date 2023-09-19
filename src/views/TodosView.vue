@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch, computed } from 'vue';
 import { uid } from "uid";
 import { Icon } from '@iconify/vue';
 import TodoCreator from '../components/TodoCreator.vue';
@@ -7,6 +7,30 @@ import TodoItem from '../components/TodoItem.vue';
 
 
 const todoList = reactive([]);
+
+watch(todoList, () => {
+  setTodoListLocalStorage();
+},{
+  deep: true
+})
+
+const todoCompleted = computed(() => {
+  return todoList.every(todo => todo.isCompleted)
+});
+
+const setTodoListLocalStorage = () => {
+  localStorage.setItem('todoList', JSON.stringify(todoList));
+};
+
+const fetchTodoListLocalStorage = () => {
+  const savedTodoList = JSON.parse(localStorage.getItem('todoList'));
+  if (savedTodoList){
+    todoList.push(...savedTodoList);
+  }
+};
+
+fetchTodoListLocalStorage();
+
 const createTodo = (todo) => {
   todoList.push({
     id: uid(),
@@ -29,6 +53,10 @@ const toggleTodoNewUpdate = (newTodoValue, todoPos) => {
   todoList[todoPos].todo = newTodoValue;
 }
 
+const removeTodoList = (todoID) =>{
+  const indexBasedOnTodoID = todoList.indexOf(todoList.find(obj => obj.id == todoID));
+  todoList.splice(indexBasedOnTodoID, 1);
+}  
 
 </script>
 
@@ -37,11 +65,15 @@ const toggleTodoNewUpdate = (newTodoValue, todoPos) => {
     <h1>Create Todo</h1>
     <TodoCreator @create-todo="createTodo" />
     <ul class="todo-list" v-if="todoList.length > 0">
-      <TodoItem v-for="(todo, index) in todoList" :todo="todo" :index="index" @toggle-edit="toggleTodoEdit" @toggle-complete="toggleTodoComplete" @new-update="toggleTodoNewUpdate"/>
+      <TodoItem v-for="(todo, index) in todoList" :todo="todo" :index="index" @toggle-edit="toggleTodoEdit" @toggle-complete="toggleTodoComplete" @new-update="toggleTodoNewUpdate" @remove-todo="removeTodoList"/>
     </ul>
     <p class="todos-msg" v-else>
       <Icon icon="noto-v1:sad-but-relieved-face" />
       <span>You have no todos to complete! Add one!</span>
+    </p>
+    <p v-if="todoCompleted && todoList.length > 0" class="todos-msg">
+      <Icon icon="noto-v1:party-popper" />
+      <span>You have completed all todos!</span>
     </p>
   </main>
 </template>

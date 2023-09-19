@@ -11,11 +11,12 @@ import { RouterLink } from 'vue-router';
             <img src="../assets/Vue_Logo_Black.png" alt="logo">
         </div>
         <h1>Vue Todos</h1>
-    </nav>
-    <ul class="nav-routes">
+        <ul class="nav-routes">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
     </ul>
+    </nav>
+ 
    </header>
 </template>
 

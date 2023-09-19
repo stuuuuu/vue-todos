@@ -16,7 +16,7 @@ const props = defineProps({
 
 console.log(props.todo);
 
-defineEmits(['toggle-complete', 'toggle-edit', 'new-update']);
+defineEmits(['toggle-complete', 'toggle-edit', 'new-update', 'remove-todo']);
 
 </script>
 
@@ -25,14 +25,14 @@ defineEmits(['toggle-complete', 'toggle-edit', 'new-update']);
         <input type="checkbox" :checked="todo.isCompleted" @input="$emit('toggle-complete', index)">
         <div class="todo">
             <input v-if="todo.isEditing" type="text" :value="todo.todo" @input="$emit('new-update', $event.target.value, index)">
-            <span v-else>
+            <span v-else :class="{striked: todo.isCompleted}">
                 {{ todo.todo }}
             </span>
         </div>
         <div class="todo-actions">
             <Icon v-if="todo.isEditing" icon="ph:check-circle" class="icon" color="#41b080" @click="$emit('toggle-edit', index)"/>
             <Icon v-else icon="ph:pencil-fill" class="icon" color="#41b080" @click="$emit('toggle-edit', index)"/>
-            <Icon icon="ph:trash" class="icon" color="#f95e5e" @click="" />
+            <Icon icon="ph:trash" class="icon" color="#f95e5e" @click="$emit('remove-todo', props.todo.id)" />
         </div>
     </li>
 </template>
@@ -62,6 +62,7 @@ li {
         background-color: #fff;
         border-radius: 50%;
         box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        cursor: pointer;
 
         &:checked {
             background-color: #41b080;
@@ -76,6 +77,10 @@ li {
             padding: 2px 6px;
             border: 2px solid #41b080;
         }
+
+        span.striked{
+            text-decoration: line-through;
+        }
     }
 
     .todo-actions {
@@ -83,6 +88,7 @@ li {
         gap: 6px;
         opacity: 0;
         transition: 150ms ease-in-out;
+        cursor: pointer;
 
         .icon {
             cursor: pointer;
